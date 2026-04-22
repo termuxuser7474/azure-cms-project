@@ -1,4 +1,5 @@
 import os
+from urllib.parse import quote_plus
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -16,8 +17,11 @@ class Config(object):
     SQL_USER_NAME = os.environ.get('SQL_USER_NAME') or 'cmsadmin'
     SQL_PASSWORD = os.environ.get('SQL_PASSWORD') or 'M@ss@@@786'
     
-    # Corrected Connection String
-    SQLALCHEMY_DATABASE_URI = 'mssql+pyodbc://' + SQL_USER_NAME + ':' + SQL_PASSWORD + '@' + SQL_SERVER + ':1433/' + SQL_DATABASE + '?driver=ODBC+Driver+17+for+SQL+Server'
+    # URL-encode the password to handle special characters like '@'
+    params = quote_plus(SQL_PASSWORD)
+    
+    # Finalized Connection String
+    SQLALCHEMY_DATABASE_URI = f'mssql+pyodbc://{SQL_USER_NAME}:{params}@{SQL_SERVER}/{SQL_DATABASE}?driver=ODBC+Driver+17+for+SQL+Server'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     ### Info for MS Authentication ###
