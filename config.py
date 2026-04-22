@@ -18,10 +18,14 @@ class Config(object):
     SQL_PASSWORD = os.environ.get('SQL_PASSWORD') or 'M@ss@@@786'
     
     # URL-encode the password to handle special characters like '@'
-    params = quote_plus(SQL_PASSWORD)
+    # This prevents the '@' in your password from breaking the connection string
+    encoded_password = quote_plus(SQL_PASSWORD)
     
-    # Finalized Connection String
-    SQLALCHEMY_DATABASE_URI = f'mssql+pyodbc://{SQL_USER_NAME}:{params}@{SQL_SERVER}/{SQL_DATABASE}?driver=ODBC+Driver+17+for+SQL+Server'
+    # Finalized Connection String with extra LoginTimeout to fix the 'Login timeout expired' error
+    SQLALCHEMY_DATABASE_URI = (
+        f'mssql+pyodbc://{SQL_USER_NAME}:{encoded_password}@{SQL_SERVER}/{SQL_DATABASE}'
+        '?driver=ODBC+Driver+17+for+SQL+Server&LoginTimeout=30'
+    )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     ### Info for MS Authentication ###
