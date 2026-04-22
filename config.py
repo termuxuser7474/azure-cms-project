@@ -18,13 +18,13 @@ class Config(object):
     SQL_PASSWORD = os.environ.get('SQL_PASSWORD') or 'M@ss@@@786'
     
     # URL-encode the password to handle special characters like '@'
-    # This prevents the '@' in your password from breaking the connection string
     encoded_password = quote_plus(SQL_PASSWORD)
     
-    # Finalized Connection String with extra LoginTimeout to fix the 'Login timeout expired' error
+    # Finalized Connection String
+    # Added encrypt=yes and TrustServerCertificate=no for Azure SQL best practices
     SQLALCHEMY_DATABASE_URI = (
         f'mssql+pyodbc://{SQL_USER_NAME}:{encoded_password}@{SQL_SERVER}/{SQL_DATABASE}'
-        '?driver=ODBC+Driver+17+for+SQL+Server&LoginTimeout=30'
+        '?driver=ODBC+Driver+17+for+SQL+Server&LoginTimeout=30&encrypt=yes&TrustServerCertificate=no'
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
