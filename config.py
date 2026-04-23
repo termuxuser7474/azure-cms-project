@@ -15,7 +15,7 @@ class Config(object):
     SQL_SERVER = os.environ.get('SQL_SERVER') or 'cms-server-12.database.windows.net'
     SQL_DATABASE = os.environ.get('SQL_DATABASE') or 'cms'
     SQL_USER_NAME = os.environ.get('SQL_USER_NAME') or 'cmsadmin'
-    SQL_PASSWORD = os.environ.get('SQL_PASSWORD') or 'M@ss@@@786'
+    SQL_PASSWORD = os.environ.get('SQL_PASSWORD') or r'M@ss@@@786'
     
     # URL-encode the password to handle special characters like '@'
     encoded_password = quote_plus(SQL_PASSWORD)
