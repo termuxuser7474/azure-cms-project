@@ -22,10 +22,12 @@ class Config(object):
     
     # Finalized Connection String
     # THE FIX: Added :1433 immediately after {SQL_SERVER} to force the correct routing
+    # Change from 'ODBC+Driver+17+for+SQL+Server' to '{ODBC Driver 18 for SQL Server}'
+# And add TrustServerCertificate=yes
     SQLALCHEMY_DATABASE_URI = (
         f'mssql+pyodbc://{SQL_USER_NAME}:{encoded_password}@{SQL_SERVER}:1433/{SQL_DATABASE}'
-        '?driver=ODBC+Driver+17+for+SQL+Server&LoginTimeout=30&encrypt=yes&TrustServerCertificate=no'
-    )
+    '?driver=ODBC+Driver+18+for+SQL+Server&LoginTimeout=30&encrypt=yes&TrustServerCertificate=yes'
+     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     ### Info for MS Authentication ###
