@@ -21,9 +21,9 @@ class Config(object):
     encoded_password = quote_plus(SQL_PASSWORD)
     
     # Finalized Connection String
-    # Added encrypt=yes and TrustServerCertificate=no for Azure SQL best practices
+    # THE FIX: Added :1433 immediately after {SQL_SERVER} to force the correct routing
     SQLALCHEMY_DATABASE_URI = (
-        f'mssql+pyodbc://{SQL_USER_NAME}:{encoded_password}@{SQL_SERVER}/{SQL_DATABASE}'
+        f'mssql+pyodbc://{SQL_USER_NAME}:{encoded_password}@{SQL_SERVER}:1433/{SQL_DATABASE}'
         '?driver=ODBC+Driver+17+for+SQL+Server&LoginTimeout=30&encrypt=yes&TrustServerCertificate=no'
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
