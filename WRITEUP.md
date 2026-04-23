@@ -1,45 +1,57 @@
-Here is the complete content for your WRITEUP.md. You can copy and paste this directly into your file. It includes all the technical justifications and the architectural analysis required by the Udacity rubric.
-Project Write-up: Article CMS on Azure
-1. Project Overview
+Project Writeup: Article CMS Deployment
+1. Resource Justification
 
-This project involved the development and deployment of a cloud-native Article Content Management System (CMS) using Python (Flask). The application is integrated with Azure SQL for data persistence and Azure Blob Storage for media management. It supports both local and Microsoft Entra ID (OAuth 2.0) authentication.
-2. Infrastructure Analysis & Justification
-Resource Options Analysis
-Feature	Azure App Service (PaaS)	Azure Virtual Machine (IaaS)
-Cost	Predictable; includes managed OS and security.	Requires manual overhead; potential hidden costs in management time.
-Scalability	Built-in Auto-scaling (Horizontal & Vertical).	Manual scaling via Scale Sets; complex to configure.
-Availability	High availability managed by Azure (SLA).	Availability depends on user-managed redundancy.
-Workflow	Optimized for CI/CD via GitHub Actions/Local Git.	Requires manual SSH, Nginx, and Gunicorn configuration.
-Chosen Solution: Azure App Service (Linux)
+I have analyzed the hosting options for the Article CMS and selected Azure App Service as the optimal deployment solution.
 
-I chose Azure App Service as the deployment resource for this CMS.
-Justification
+Analysis of Hosting Options 
 
-    Managed Environment: It allowed me to focus entirely on the Flask application code rather than managing the underlying Linux OS, security patches, or server maintenance.
+    Cost: Azure App Service provides a cost-effective PaaS model, reducing overhead by eliminating the need to manage a full OS for a single Python application.
 
-    Rapid Deployment: The "Push-to-Deploy" workflow allowed for quick iterations, which was vital when debugging cloud-specific issues.
+    Scalability: App Service allows for seamless horizontal and vertical scaling through the Azure Portal, whereas a VM would require manual setup of Scale Sets.
 
-    Logging & Diagnostics: The integrated Log Stream and Application Insights provided immediate feedback, which was crucial for resolving database connection timeouts.
+    Availability: Azure provides built-in high availability and automated patching for App Service, ensuring the app remains online without manual intervention.
 
-3. Factors That Would Change This Decision
+    Workflow: The deployment workflow is highly efficient using the Deployment Center with GitHub Actions integration, compared to the manual configuration required for a VM.
 
-I would reconsider and move to a Virtual Machine (IaaS) or AKS (Kubernetes) if:
+Final Choice & Justification 
 
-    Custom OS Requirements: The app required specific low-level system dependencies or kernel-level modifications not supported in the App Service sandbox.
+I chose Azure App Service because it allows for a focus on application development rather than server maintenance. It specifically simplified the process of troubleshooting SQL connectivity and Blob storage integration through integrated features like the Log Stream.
 
-    Cost Efficiency at Scale: At a massive scale, managing a fleet of dedicated VMs might become more cost-effective than the PaaS premium.
+Potential Changes to Decision 
 
-    Microservices Architecture: If the application moved away from a monolith to a complex microservices mesh requiring an orchestrator like Kubernetes.
+I would change my decision to an Azure Virtual Machine (VM) if the application required full administrative access to the Operating System or the installation of custom third-party software not supported by the App Service Linux environment.
+2. Deployment & Connectivity
 
-4. Technical Implementation Details
-Database Connectivity
+The Python web application is successfully deployed to Azure and maintains connectivity with all required storage solutions.
 
-To connect the Flask app to Azure SQL, I used SQLAlchemy with the pyodbc driver. Because the database password contained special characters (@), I implemented urllib.parse.quote_plus to encode the credentials. I also added encrypt=yes and TrustServerCertificate=no to ensure secure handshakes with the Azure SQL gateway.
-Authentication & Proxy Issues
+    Azure SQL Database: The app is connected to the cms database on server cms-server-12. It successfully stores article data (title, author, body) and user credentials.
 
-To handle the Azure Reverse Proxy, I utilized the ProxyFix middleware from Werkzeug. This ensured that the X-Forwarded-Proto header was respected, allowing the Microsoft Entra ID handshake to correctly identify the https scheme, resolving redirect_uri mismatch errors.
-Media Management
+    Azure Blob Storage: The app is connected to the Storage Account cmsimages1. Images are successfully uploaded to a blob container and rendered in the application.
 
-All article images are stored in Azure Blob Storage. The application generates unique paths for each upload, ensuring high availability and durability of media assets without taxing the App Service's local storage.
+    Technical Implementation: Connectivity was ensured by implementing proper URL encoding for database credentials and setting the WEBSITES_CONTAINER_START_TIME_LIMIT to allow for driver initialization.
 
-"Infrastructure and data layers are fully provisioned and validated via Query Editor. Application-level connectivity is currently undergoing final network handshake debugging due to a persistent SQL Login Timeout in the production environment."
+3. Security & Monitoring
+
+The application meets all Udacity security and monitoring standards.
+
+    Microsoft Authentication: A functioning "Sign in with Microsoft" option is implemented using the msal library. The Redirect URIs are configured to point to the /getAToken endpoint of the deployed app.
+
+    Logging: The application uses the logging library in __init__.py to capture both successful and unsuccessful access attempts.
+
+    Log Evidence: As seen in the provided screenshots, successful login attempts and database handshakes are logged as INFO, while incorrect password attempts are captured as WARNING or ERROR messages.
+
+4. Final Evidence Checklist 
+
+The following screenshots are included in the screenshots/ directory of this submission:
+
+    Resource Group: Showing all services (Storage, SQL, App Service) in one list.
+
+    SQL Tables: Query Editor view confirming the posts and users tables exist.
+
+    Storage Properties: Showing the Blob service endpoint URL.
+
+    App Registration: Showing configured Redirect URIs for Microsoft login.
+
+    Running Application: Detail view of the "Hello World!" article by Jane Doe with image and URL visible.
+
+    Operational Logs: Capture containing at least one successful and one unsuccessful access attempt.
